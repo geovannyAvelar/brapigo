@@ -82,7 +82,7 @@ func (a BrApi) SearchTickets(keyword string) ([]string, error) {
 	return tickerResponse.Stocks, nil
 }
 
-func (a BrApi) ListTickers() ([]Stock, error) {
+func (a BrApi) ListStocks() ([]Stock, error) {
 	resp, err := http.Get(a.baseUrl + "/api/quote/list")
 	return parseStockResponse(resp, err)
 }

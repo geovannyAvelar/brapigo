@@ -64,12 +64,12 @@ func TestSearchTickets(t *testing.T) {
 	}
 }
 
-func TestListAllTickers(t *testing.T) {
+func TestListStocks(t *testing.T) {
 	testApiServer := runTestServer()
 
 	brApi := NewBrApiWithCustomBaseUrl(testApiServer.URL)
 
-	tickers, err := brApi.ListTickers()
+	tickers, err := brApi.ListStocks()
 
 	if err != nil {
 		t.Errorf("Error in /api/quote/list request. Cause %s", err.Error())
