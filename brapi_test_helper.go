@@ -44,13 +44,13 @@ var endpoints map[string]handler = map[string]handler{
 		return json.Marshal(StockApiResponse{Stocks: stocksFound})
 	},
 	"/api/quote/PETR4,ITUB3": func(r *http.Request) ([]byte, error) {
-		stocksFound, err := searchAssetsByTicker("PETR4,ITUB3")
+		quotes, err := loadQuoteData()
 
 		if err != nil {
 			return nil, err
 		}
 
-		return json.Marshal(StockApiResponse{Stocks: stocksFound})
+		return json.Marshal(quotes)
 	},
 	"/api/available": func(r *http.Request) ([]byte, error) {
 		keyword := r.URL.Query().Get("search")
@@ -125,4 +125,17 @@ func loadAllAssets() (*StockApiResponse, error) {
 	err = json.Unmarshal(data, &stocksData)
 
 	return &stocksData, err
+}
+
+func loadQuoteData() (*QuoteApiResponse, error) {
+	data, err := os.ReadFile("test-data/quote_data.json")
+
+	if err != nil {
+		return nil, err
+	}
+
+	quoteData := QuoteApiResponse{}
+	err = json.Unmarshal(data, &quoteData)
+
+	return &quoteData, err
 }

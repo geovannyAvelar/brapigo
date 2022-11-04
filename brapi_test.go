@@ -9,40 +9,26 @@ func TestFindAssetByTicker(t *testing.T) {
 
 	brApi := NewBrApiWithCustomBaseUrl(testApiServer.URL)
 
-	stocks, err := brApi.FindAssetByTicker("PETR3")
+	quotes, err := brApi.FindAssetByTicker("PETR4", "ITUB3")
 
 	if err != nil {
-		t.Errorf("Error in /api/quote/PETR3 request. Cause %s", err.Error())
+		t.Errorf("Error during /api/quote/PETR4,ITUB3. Cause: %s", err.Error())
 	}
 
-	var petr3Stock *Stock
+	var petr4Quote *Quote
+	var itub3Quote *Quote
 
-	for _, stock := range stocks {
-		if stock.Stock == "PETR3" {
-			petr3Stock = &stock
+	for _, quote := range quotes {
+		if quote.Symbol == "PETR4" {
+			petr4Quote = &quote
+		}
+
+		if quote.Symbol == "ITUB3" {
+			itub3Quote = &quote
 		}
 	}
 
-	if petr3Stock == nil {
-		t.Errorf("Error in /api/quote/PETR3 request. Could not find PETR3")
-	}
-
-	stocks, err = brApi.FindAssetByTicker("PETR4,ITUB3")
-
-	var petr4Stock *Stock
-	var itub3Stock *Stock
-
-	for _, stock := range stocks {
-		if stock.Stock == "PETR4" {
-			petr4Stock = &stock
-		}
-
-		if stock.Stock == "ITUB3" {
-			itub3Stock = &stock
-		}
-	}
-
-	if petr4Stock == nil || itub3Stock == nil {
+	if petr4Quote == nil || itub3Quote == nil {
 		t.Errorf("Error in /api/quote/PETR4,ITUB3 request. Could not find PETR4 or ITUB3")
 	}
 }

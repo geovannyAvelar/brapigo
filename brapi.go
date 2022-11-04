@@ -25,6 +25,10 @@ type StockApiResponse struct {
 	Stocks []Stock `json:"stocks"`
 }
 
+type QuoteApiResponse struct {
+	Results []Quote `json:"results"`
+}
+
 type TickerApiResponse struct {
 	Stocks []string `json:"stocks"`
 }
@@ -40,10 +44,18 @@ type Stock struct {
 	Sector    string  `json:"sector"`
 }
 
-func (a BrApi) FindAssetByTicker(tickers ...string) ([]Stock, error) {
+type Quote struct {
+	Symbol             string  `json:"symbol"`
+	ShortName          string  `json:"shortName"`
+	LongName           string  `json:"LongName"`
+	Currency           string  `json:"Currency"`
+	RegularMarketPrice float64 `json:"RegularMarketPrice"`
+}
+
+func (a BrApi) FindAssetByTicker(tickers ...string) ([]Quote, error) {
 	tickersParam := strings.Join(tickers, ",")
 	resp, err := http.Get(a.baseUrl + "/api/quote/" + tickersParam)
-	return parseStockResponse(resp, err)
+	return parseQuoteResponse(resp, err)
 }
 
 func (a BrApi) SearchTickets(keyword string) ([]string, error) {
@@ -106,4 +118,25 @@ func parseStockResponse(resp *http.Response, err error) ([]Stock, error) {
 	}
 
 	return stocksData.Stocks, nil
+}
+
+func parseQuoteResponse(resp *http.Response, err error) ([]Quote, error) {
+	if err != nil {
+		return nil, err
+	}
+
+	responseData, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	quoteData := QuoteApiResponse{}
+	err = json.Unmarshal(responseData, &quoteData)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return quoteData.Results, nil
 }
