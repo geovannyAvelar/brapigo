@@ -14,7 +14,7 @@ func runTestServer() *httptest.Server {
 	data, err := loadAllAssets()
 
 	if err != nil {
-		panic("Cannot load test-data/list.json data file")
+		panic("Cannot load testdata/list.json data file")
 	}
 
 	stocksData = data
@@ -115,7 +115,7 @@ func searchAssetsByKeyword(keyword string) ([]Stock, error) {
 }
 
 func loadAllAssets() (*StockApiResponse, error) {
-	data, err := os.ReadFile("test-data/list.json")
+	data, err := os.ReadFile("testdata/list.json")
 
 	if err != nil {
 		return nil, err
@@ -128,7 +128,7 @@ func loadAllAssets() (*StockApiResponse, error) {
 }
 
 func loadQuoteData() (*QuoteApiResponse, error) {
-	data, err := os.ReadFile("test-data/quote_data.json")
+	data, err := os.ReadFile("testdata/quote_data.json")
 
 	if err != nil {
 		return nil, err
