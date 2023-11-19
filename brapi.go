@@ -5,20 +5,26 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 )
 
 const DEFAULT_BASE_URL = "https://brapi.dev"
 
 func NewBrApi() BrApi {
-	return BrApi{baseUrl: DEFAULT_BASE_URL}
+	return BrApi{baseUrl: DEFAULT_BASE_URL, Client: &http.Client{
+		Timeout: 10 * time.Second,
+	}}
 }
 
 func NewBrApiWithCustomBaseUrl(baseUrl string) BrApi {
-	return BrApi{baseUrl}
+	return BrApi{baseUrl: baseUrl, Client: &http.Client{
+		Timeout: 10 * time.Second,
+	}}
 }
 
 type BrApi struct {
 	baseUrl string
+	Client  *http.Client
 }
 
 type StockApiResponse struct {
@@ -54,13 +60,11 @@ type Quote struct {
 
 func (a BrApi) FindAssetByTicker(tickers ...string) ([]Quote, error) {
 	tickersParam := strings.Join(tickers, ",")
-	resp, err := http.Get(a.baseUrl + "/api/quote/" + tickersParam)
+	resp, err := a.Client.Get(a.baseUrl + "/api/quote/" + tickersParam)
 	return parseQuoteResponse(resp, err)
 }
 
 func (a BrApi) SearchTickets(keyword string) ([]string, error) {
-	client := &http.Client{}
-
 	req, err := http.NewRequest("GET", a.baseUrl+"/api/available", nil)
 	q := req.URL.Query()
 	q.Add("search", keyword)
@@ -70,7 +74,7 @@ func (a BrApi) SearchTickets(keyword string) ([]string, error) {
 		return nil, err
 	}
 
-	resp, err := client.Do(req)
+	resp, err := a.Client.Do(req)
 
 	if err != nil {
 		return nil, err
@@ -95,7 +99,7 @@ func (a BrApi) SearchTickets(keyword string) ([]string, error) {
 }
 
 func (a BrApi) ListStocks() ([]Stock, error) {
-	resp, err := http.Get(a.baseUrl + "/api/quote/list")
+	resp, err := a.Client.Get(a.baseUrl + "/api/quote/list")
 	return parseStockResponse(resp, err)
 }
 
