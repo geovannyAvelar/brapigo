@@ -2,7 +2,7 @@ package brapigo
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -82,7 +82,7 @@ func (a BrApi) SearchTickets(keyword string) ([]string, error) {
 
 	defer resp.Body.Close()
 
-	responseData, err := ioutil.ReadAll(resp.Body)
+	responseData, err := io.ReadAll(resp.Body)
 
 	if err != nil {
 		return nil, err
@@ -108,7 +108,7 @@ func parseStockResponse(resp *http.Response, err error) ([]Stock, error) {
 		return nil, err
 	}
 
-	responseData, err := ioutil.ReadAll(resp.Body)
+	responseData, err := io.ReadAll(resp.Body)
 
 	if err != nil {
 		return nil, err
@@ -129,7 +129,7 @@ func parseQuoteResponse(resp *http.Response, err error) ([]Quote, error) {
 		return nil, err
 	}
 
-	responseData, err := ioutil.ReadAll(resp.Body)
+	responseData, err := io.ReadAll(resp.Body)
 
 	if err != nil {
 		return nil, err
