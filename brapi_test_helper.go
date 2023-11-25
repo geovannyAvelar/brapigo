@@ -9,15 +9,24 @@ import (
 )
 
 var stocksData *StockApiResponse
+var cryptoData []CryptoCoin
 
 func runTestServer() *httptest.Server {
-	data, err := loadAllAssets()
+	stocks, err := loadAllAssets()
 
 	if err != nil {
-		panic("Cannot load testdata/list.json data file")
+		panic("Cannot load testdata/list.json stocksData file")
 	}
 
-	stocksData = data
+	stocksData = stocks
+
+	crypto, err := loadCryptocoins()
+
+	if err != nil {
+		panic("Cannot load testdata/cryptocoins.json cryptocoins file")
+	}
+
+	cryptoData = crypto
 
 	return httptest.NewServer(http.HandlerFunc(rootHandlerFunc))
 }
@@ -71,6 +80,19 @@ var endpoints map[string]handler = map[string]handler{
 	},
 	"/v2/crypto/available": func(r *http.Request) ([]byte, error) {
 		return json.Marshal(CoinsApiResponse{Coins: []string{"BTC"}})
+	},
+	"/v2/crypto": func(r *http.Request) ([]byte, error) {
+		q := r.URL.Query()
+		coins := q.Get("coin")
+		currency := q.Get("currency")
+
+		cryptos := searchCryptoCoins(strings.Split(coins, ","), currency)
+
+		data := struct {
+			Coins []CryptoCoin `json:"coins"`
+		}{Coins: cryptos}
+
+		return json.Marshal(data)
 	},
 }
 
@@ -141,4 +163,34 @@ func loadQuoteData() (*QuoteApiResponse, error) {
 	err = json.Unmarshal(data, &quoteData)
 
 	return &quoteData, err
+}
+
+func loadCryptocoins() ([]CryptoCoin, error) {
+	data, err := os.ReadFile("testdata/cryptocoins.json")
+
+	if err != nil {
+		return nil, err
+	}
+
+	coinsRes := struct {
+		Coins []CryptoCoin `json:"coins"`
+	}{}
+
+	err = json.Unmarshal(data, &coinsRes)
+
+	return coinsRes.Coins, err
+}
+
+func searchCryptoCoins(coins []string, currency string) (cryptos []CryptoCoin) {
+	for _, c := range cryptoData {
+		if c.Currency == currency {
+			for _, ticker := range coins {
+				if ticker == c.Coin {
+					cryptos = append(cryptos, c)
+				}
+			}
+		}
+	}
+
+	return cryptos
 }

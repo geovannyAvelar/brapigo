@@ -2,6 +2,7 @@ package brapigo
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"strings"
@@ -61,6 +62,23 @@ type Quote struct {
 
 type CoinsApiResponse struct {
 	Coins []string `json:"coins"`
+}
+
+type CryptoCoin struct {
+	Currency                   string  `json:"currency"`
+	CurrencyRateFromUSD        float64 `json:"currencyRateFromUSD"`
+	CoinName                   string  `json:"coinName"`
+	Coin                       string  `json:"coin"`
+	RegularMarketChange        float64 `json:"regularMarketChange"`
+	RegularMarketPrice         float64 `json:"regularMarketPrice"`
+	RegularMarketChangePercent float64 `json:"regularMarketChangePercent"`
+	RegularMarketDayLow        float64 `json:"regularMarketDayLow"`
+	RegularMarketDayHigh       float64 `json:"regularMarketDayHigh"`
+	RegularMarketDayRange      string  `json:"regularMarketDayRange"`
+	RegularMarketVolume        float64 `json:"regularMarketVolume"`
+	MarketCap                  float64 `json:"marketCap"`
+	RegularMarketTime          int     `json:"regularMarketTime"`
+	CoinImageUrl               string  `json:"coinImageUrl"`
 }
 
 func (a BrApi) FindAssetByTicker(tickers ...string) ([]Quote, error) {
@@ -172,6 +190,51 @@ func (a BrApi) ListCryptoCoins() ([]string, error) {
 	}
 
 	return coinsResponse.Coins, nil
+}
+
+func (a BrApi) FindCryptoCoin(coins []string, currency string) ([]CryptoCoin, error) {
+	if len(coins) == 0 {
+		return nil, errors.New("it is necessary to inform at least one cryptocoin")
+	}
+
+	req, err := http.NewRequest("GET", a.baseUrl+"/v2/crypto", nil)
+
+	q := req.URL.Query()
+
+	if a.Token != "" {
+		q.Add("token", a.Token)
+	}
+
+	q.Add("coin", strings.Join(coins, ","))
+
+	if currency != "" {
+		q.Add("currency", currency)
+	}
+
+	req.URL.RawQuery = q.Encode()
+
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := a.Client.Do(req)
+
+	responseData, err := io.ReadAll(resp.Body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	coinsRes := struct {
+		Coins []CryptoCoin `json:"coins"`
+	}{}
+	err = json.Unmarshal(responseData, &coinsRes)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return coinsRes.Coins, nil
 }
 
 func parseStockResponse(resp *http.Response, err error) ([]Stock, error) {

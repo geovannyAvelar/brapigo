@@ -1,0 +1,36 @@
+{
+  "coins": [
+    {
+      "currency": "BRL",
+      "currencyRateFromUSD": 5.1355,
+      "coinName": "Bitcoin USD",
+      "coin": "BTC",
+      "regularMarketChange": -1570.9113445900002,
+      "regularMarketPrice": 142013.9997515,
+      "regularMarketChangePercent": -1.0940657,
+      "regularMarketDayLow": 141363.00322950003,
+      "regularMarketDayHigh": 142229.63939650002,
+      "regularMarketDayRange": "141363.00322950003 - 142229.63939650002",
+      "regularMarketVolume": 61914332113.408005,
+      "marketCap": 2770574921580.5444,
+      "regularMarketTime": 1696907700,
+      "coinImageUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png"
+    },
+    {
+      "currency": "BRL",
+      "currencyRateFromUSD": 5.1355,
+      "coinName": "Ethereum Classic USD",
+      "coin": "ETC",
+      "regularMarketChange": -1.9971802353700003,
+      "regularMarketPrice": 77.496348631,
+      "regularMarketChangePercent": -2.5123825,
+      "regularMarketDayLow": 77.03953563500001,
+      "regularMarketDayHigh": 77.54323574600001,
+      "regularMarketDayRange": "77.03953563500001 - 77.54323574600001",
+      "regularMarketVolume": 434294814.51600003,
+      "marketCap": 11115092801.024,
+      "regularMarketTime": 1696907700,
+      "coinImageUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/1321.png"
+    }
+  ]
+}
