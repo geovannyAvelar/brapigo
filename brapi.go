@@ -24,6 +24,7 @@ func NewBrApiWithCustomBaseUrl(baseUrl string) BrApi {
 
 type BrApi struct {
 	baseUrl string
+	Token   string
 	Client  *http.Client
 }
 
@@ -60,14 +61,32 @@ type Quote struct {
 
 func (a BrApi) FindAssetByTicker(tickers ...string) ([]Quote, error) {
 	tickersParam := strings.Join(tickers, ",")
-	resp, err := a.Client.Get(a.baseUrl + "/quote/" + tickersParam)
+
+	req, err := http.NewRequest("GET", a.baseUrl+"/quote/"+tickersParam, nil)
+
+	q := req.URL.Query()
+
+	if a.Token != "" {
+		q.Add("token", a.Token)
+	}
+
+	req.URL.RawQuery = q.Encode()
+
+	resp, err := a.Client.Do(req)
+
 	return parseQuoteResponse(resp, err)
 }
 
 func (a BrApi) SearchTickets(keyword string) ([]string, error) {
 	req, err := http.NewRequest("GET", a.baseUrl+"/available", nil)
+
 	q := req.URL.Query()
 	q.Add("search", keyword)
+
+	if a.Token != "" {
+		q.Add("token", a.Token)
+	}
+
 	req.URL.RawQuery = q.Encode()
 
 	if err != nil {
@@ -99,7 +118,22 @@ func (a BrApi) SearchTickets(keyword string) ([]string, error) {
 }
 
 func (a BrApi) ListStocks() ([]Stock, error) {
-	resp, err := a.Client.Get(a.baseUrl + "/quote/list")
+	req, err := http.NewRequest("GET", a.baseUrl+"/quote/list", nil)
+
+	q := req.URL.Query()
+
+	if a.Token != "" {
+		q.Add("token", a.Token)
+	}
+
+	req.URL.RawQuery = q.Encode()
+
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := a.Client.Do(req)
+
 	return parseStockResponse(resp, err)
 }
 
@@ -107,6 +141,8 @@ func parseStockResponse(resp *http.Response, err error) ([]Stock, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	defer resp.Body.Close()
 
 	responseData, err := io.ReadAll(resp.Body)
 
@@ -128,6 +164,8 @@ func parseQuoteResponse(resp *http.Response, err error) ([]Quote, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	defer resp.Body.Close()
 
 	responseData, err := io.ReadAll(resp.Body)
 
