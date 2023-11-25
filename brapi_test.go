@@ -89,6 +89,21 @@ func TestListCryptoCoins(t *testing.T) {
 	}
 }
 
+func TestFindCryptoCoin(t *testing.T) {
+	t.Parallel()
+
+	testApiServer := runTestServer()
+
+	brApi := NewBrApiWithCustomBaseUrl(testApiServer.URL)
+
+	_, err := brApi.FindCryptoCoin([]string{"BTC", "ETH"}, "BRL")
+
+	if err != nil {
+		t.Errorf("Cannot find cryptocoins. Cause: %s", err)
+	}
+}
+
+// TEST HELPERS
 var stocksData *StockApiResponse
 var cryptoData []CryptoCoin
 
