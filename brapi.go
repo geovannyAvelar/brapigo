@@ -59,6 +59,10 @@ type Quote struct {
 	RegularMarketPrice float64 `json:"RegularMarketPrice"`
 }
 
+type CoinsApiResponse struct {
+	Coins []string `json:"coins"`
+}
+
 func (a BrApi) FindAssetByTicker(tickers ...string) ([]Quote, error) {
 	tickersParam := strings.Join(tickers, ",")
 
@@ -135,6 +139,39 @@ func (a BrApi) ListStocks() ([]Stock, error) {
 	resp, err := a.Client.Do(req)
 
 	return parseStockResponse(resp, err)
+}
+
+func (a BrApi) ListCryptoCoins() ([]string, error) {
+	req, err := http.NewRequest("GET", a.baseUrl+"/v2/crypto/available", nil)
+
+	q := req.URL.Query()
+
+	if a.Token != "" {
+		q.Add("token", a.Token)
+	}
+
+	req.URL.RawQuery = q.Encode()
+
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := a.Client.Do(req)
+
+	responseData, err := io.ReadAll(resp.Body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	coinsResponse := CoinsApiResponse{}
+	err = json.Unmarshal(responseData, &coinsResponse)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return coinsResponse.Coins, nil
 }
 
 func parseStockResponse(resp *http.Response, err error) ([]Stock, error) {

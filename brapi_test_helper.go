@@ -69,6 +69,9 @@ var endpoints map[string]handler = map[string]handler{
 
 		return json.Marshal(response)
 	},
+	"/v2/crypto/available": func(r *http.Request) ([]byte, error) {
+		return json.Marshal(CoinsApiResponse{Coins: []string{"BTC"}})
+	},
 }
 
 var rootHandlerFunc = func(w http.ResponseWriter, r *http.Request) {

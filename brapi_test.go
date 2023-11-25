@@ -65,3 +65,21 @@ func TestListStocks(t *testing.T) {
 		t.Errorf("Error is request. Received %d but expected %d", len(tickers), 1585)
 	}
 }
+
+func TestListCryptoCoins(t *testing.T) {
+	t.Parallel()
+
+	testApiServer := runTestServer()
+
+	brApi := NewBrApiWithCustomBaseUrl(testApiServer.URL)
+
+	coin, err := brApi.ListCryptoCoins()
+
+	if err != nil {
+		t.Errorf("Error in /v2/crypto/available request. Cause: %s", err)
+	}
+
+	if len(coin) == 0 {
+		t.Errorf("Coins slice is empty")
+	}
+}
