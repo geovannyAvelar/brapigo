@@ -25,7 +25,7 @@ func runTestServer() *httptest.Server {
 type handler func(r *http.Request) ([]byte, error)
 
 var endpoints map[string]handler = map[string]handler{
-	"/api/quote/list": func(r *http.Request) ([]byte, error) {
+	"/quote/list": func(r *http.Request) ([]byte, error) {
 		content, err := json.Marshal(stocksData)
 
 		if err != nil {
@@ -34,7 +34,7 @@ var endpoints map[string]handler = map[string]handler{
 
 		return content, nil
 	},
-	"/api/quote/PETR3": func(r *http.Request) ([]byte, error) {
+	"/quote/PETR3": func(r *http.Request) ([]byte, error) {
 		stocksFound, err := searchAssetsByTicker("PETR3")
 
 		if err != nil {
@@ -43,7 +43,7 @@ var endpoints map[string]handler = map[string]handler{
 
 		return json.Marshal(StockApiResponse{Stocks: stocksFound})
 	},
-	"/api/quote/PETR4,ITUB3": func(r *http.Request) ([]byte, error) {
+	"/quote/PETR4,ITUB3": func(r *http.Request) ([]byte, error) {
 		quotes, err := loadQuoteData()
 
 		if err != nil {
@@ -52,7 +52,7 @@ var endpoints map[string]handler = map[string]handler{
 
 		return json.Marshal(quotes)
 	},
-	"/api/available": func(r *http.Request) ([]byte, error) {
+	"/available": func(r *http.Request) ([]byte, error) {
 		keyword := r.URL.Query().Get("search")
 
 		assets, err := searchAssetsByKeyword(keyword)

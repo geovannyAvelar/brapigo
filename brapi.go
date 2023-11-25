@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-const DEFAULT_BASE_URL = "https://brapi.dev"
+const DEFAULT_BASE_URL = "https://brapi.dev/api"
 
 func NewBrApi() BrApi {
 	return BrApi{baseUrl: DEFAULT_BASE_URL, Client: &http.Client{
@@ -60,12 +60,12 @@ type Quote struct {
 
 func (a BrApi) FindAssetByTicker(tickers ...string) ([]Quote, error) {
 	tickersParam := strings.Join(tickers, ",")
-	resp, err := a.Client.Get(a.baseUrl + "/api/quote/" + tickersParam)
+	resp, err := a.Client.Get(a.baseUrl + "/quote/" + tickersParam)
 	return parseQuoteResponse(resp, err)
 }
 
 func (a BrApi) SearchTickets(keyword string) ([]string, error) {
-	req, err := http.NewRequest("GET", a.baseUrl+"/api/available", nil)
+	req, err := http.NewRequest("GET", a.baseUrl+"/available", nil)
 	q := req.URL.Query()
 	q.Add("search", keyword)
 	req.URL.RawQuery = q.Encode()
@@ -99,7 +99,7 @@ func (a BrApi) SearchTickets(keyword string) ([]string, error) {
 }
 
 func (a BrApi) ListStocks() ([]Stock, error) {
-	resp, err := a.Client.Get(a.baseUrl + "/api/quote/list")
+	resp, err := a.Client.Get(a.baseUrl + "/quote/list")
 	return parseStockResponse(resp, err)
 }
 
